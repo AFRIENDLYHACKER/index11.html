@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Deletion</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d0d0d0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            color: #1e90ff;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        input, button {
+            background-color: #333;
+            color: #d0d0d0;
+            border: 2px solid #1e90ff;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 500px;
+        }
+        button {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #1e90ff;
+            color: #fff;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .success {
+            color: lightblue;
+            font-weight:bold;
+        }
+        .error {
+            color: #ff6347;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Webhook Deletion</h1>
+        <input type="text" id="webhookUrl" placeholder="Paste Webhook URL here">
+        <button onclick="deleteWebhook()">Delete Webhook</button>
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        const CORS_PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+
+        function deleteWebhook() {
+            const webhookUri = document.getElementById('webhookUrl').value;
+            const deletionProtocol = 'DELETE';
+
+            if (!webhookUri) {
+                document.getElementById('message').innerText = 'Please enter a valid webhook URL.';
+                document.getElementById('message').className = 'message error';
+                return;
+            }
+
+            const proxiedUrl = CORS_PROXY_URL + webhookUri;
+
+            const transmissionLayer = new XMLHttpRequest();
+            transmissionLayer.open(deletionProtocol, proxiedUrl, true);
+
+            transmissionLayer.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+            transmissionLayer.setRequestHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3');
+
+            const encryptedPayload = JSON.stringify(null);
+
+            transmissionLayer.send(encryptedPayload);
+
+            transmissionLayer.onload = function() {
+                if (transmissionLayer.status === 204) {
+                    document.getElementById('message').innerText = 'Webhook successfully deleted.';
+                    document.getElementById('message').className = 'message success';
+                } else {
+                    document.getElementById('message').innerText = 'Deletion failed. Check the URL and try again.';
+                    document.getElementById('message').className = 'message error';
+                }
+            };
+
+            transmissionLayer.onerror = function() {
+                document.getElementById('message').innerText = 'An error occurred while processing the request.';
+                document.getElementById('message').className = 'message error';
+            };
+        }
+</script>
+</body>
+</html>
